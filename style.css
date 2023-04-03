@@ -22,3 +22,23 @@ html {
     padding: 5px;
   }
 }
+
+#container {
+  position: relative;
+}
+
+#btnConferir {
+  /* Posicionará o botão em relação ao canvas */
+  position: absolute;
+  /* Estabelecendo um tamanho ao botão para ficar de acordo com o design */
+  width: 96px;
+  height: 36px;
+  border-radius: 30px;
+  /* Torna o botão invisível */
+  opacity: 0;
+  /* Permite que o botão receba eventos de clique*/
+  pointer-events: auto;
+  /* Posiciono o botão na localização correta em relação ao design */
+  bottom: 80px;
+  right: 158px;
+}

@@ -10,6 +10,9 @@ const ctx = canvas.getContext("2d");
 const image = new Image();
 image.src = "../jogoDaSenha/image/design.png";
 
+// button para verificar
+const btn = document.getElementById("btnConferir");
+
 // Define as cores disponíveis e o número de cores
 const cores_disponiveis = [
   "#ff0000",
@@ -45,6 +48,14 @@ image.onload = function () {
     ctx.closePath();
   });
 
+  // Inicio o vetor com as cores padrões
+  const cores_escolhidas_usuario = [
+    posicao_bolinhas_grandes[0].color,
+    posicao_bolinhas_grandes[1].color,
+    posicao_bolinhas_grandes[2].color,
+    posicao_bolinhas_grandes[3].color,
+  ];
+
   // Adiciona um evento de clique para cada bolinha grande
   canvas.addEventListener("click", function (event) {
     // Encontra a bolinha clicada
@@ -61,7 +72,10 @@ image.onload = function () {
       // Atualiza a cor da bolinha grande clicada com a nova cor selecionada pelo usuário
       clickedCircle.colorIndex = (clickedCircle.colorIndex + 1) % num_cores;
       clickedCircle.color = cores_disponiveis[clickedCircle.colorIndex];
+      cores_escolhidas_usuario[circleIndex(clickedCircle)] =
+        clickedCircle.color;
 
+      console.log(cores_escolhidas_usuario);
       // Redesenha todas as bolinhas grandes
       posicao_bolinhas_grandes.forEach((circle) => {
         ctx.beginPath();
@@ -72,6 +86,31 @@ image.onload = function () {
       });
     }
   });
+
+  // Função que retorna o índice da bolinha no vetor
+  function circleIndex(circle) {
+    if (
+      circle.x === posicao_bolinhas_grandes[0].x &&
+      circle.y === posicao_bolinhas_grandes[0].y
+    ) {
+      return 0;
+    } else if (
+      circle.x === posicao_bolinhas_grandes[1].x &&
+      circle.y === posicao_bolinhas_grandes[1].y
+    ) {
+      return 1;
+    } else if (
+      circle.x === posicao_bolinhas_grandes[2].x &&
+      circle.y === posicao_bolinhas_grandes[2].y
+    ) {
+      return 2;
+    } else if (
+      circle.x === posicao_bolinhas_grandes[3].x &&
+      circle.y === posicao_bolinhas_grandes[3].y
+    ) {
+      return 3;
+    }
+  }
 };
 
 var posicao_bolinhas_medias = [
