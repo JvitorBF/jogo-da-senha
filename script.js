@@ -29,13 +29,22 @@ const posicao_bolinhas_grandes = [
 
 // Cria uma imagem e define sua fonte
 const image = new Image();
-image.src = "../jogo da senha/image/design.png";
+image.src = "../jogoDaSenha/image/design.png";
 
 // Cria um array para guardar a senha aleatória gerada
 const senha = [];
 for (let i = 0; i < 4; i++) {
   const indice = Math.floor(Math.random() * cores_disponiveis.length);
   senha.push(cores_disponiveis[indice]);
+}
+
+function verificaJogada(senha, escolha_usuario) {
+  for (let i = 0; i < senha.length; i++) {
+    if (senha[i] !== escolha_usuario[i]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 // Função que retorna o índice da bolinha no vetor
@@ -112,61 +121,85 @@ function atualizarCoresEscolhidas(cores_escolhidas_usuario, clickedCircle) {
 // Espera a imagem carregar antes de desenhá-la no canvas
 image.onload = function () {
   ctx.drawImage(image, 12, 20);
-
   // Desenha as bolinhas grandes iniciais
   desenharBolinhasGrandes();
-
-  // Inicio o vetor com as cores padrões
-  const cores_escolhidas_usuario = [
-    posicao_bolinhas_grandes[0].color,
-    posicao_bolinhas_grandes[1].color,
-    posicao_bolinhas_grandes[2].color,
-    posicao_bolinhas_grandes[3].color,
-  ];
-
-  // Adiciona um evento de clique para cada bolinha grande
-  canvas.addEventListener("click", function (event) {
-    // Encontra a bolinha clicada
-    const clickedCircle = encontrarBolinhaClicada(event);
-
-    if (clickedCircle) {
-      // Atualiza a cor da bolinha grande clicada com a nova cor selecionada pelo usuário
-      atualizarBolinhaGrande(clickedCircle);
-      // Esta função é responsável por atualizar as cores escolhidas pelo usuário.
-      atualizarCoresEscolhidas(cores_escolhidas_usuario, clickedCircle);
-      // Redesenha todas as bolinhas grandes
-      desenharBolinhasGrandes();
-    }
-  });
-
-  // button para verificar
-  const btn = document.getElementById("btnConferir");
-
-  btn.addEventListener("click", () => {
-    const primeira_linha = posicao_bolinhas_medias[0];
-
-    for (let i = 0; i < 4; i++) {
-      primeira_linha.forEach((circle, index) => {
-        if (index === i) {
-          ctx.beginPath();
-          if (circle.y > 645) {
-            ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
-            ctx.fillStyle = cores_escolhidas_usuario[i];
-            ctx.fill();
-            ctx.closePath();
-          }
-        }
-      });
-    }
-  });
-
-  btn.addEventListener("click", () => {
-    const primeira_linha = posicao_bolinhas_pequenas[0];
-    console.log(senha);
-    console.log(cores_escolhidas_usuario);
-    desenharBolinhasPequenas(primeira_linha, cores_escolhidas_usuario, senha);
-  });
 };
+
+// Inicio o vetor com as cores padrões
+const cores_escolhidas_usuario = [
+  posicao_bolinhas_grandes[0].color,
+  posicao_bolinhas_grandes[1].color,
+  posicao_bolinhas_grandes[2].color,
+  posicao_bolinhas_grandes[3].color,
+];
+
+// Adiciona um evento de clique para cada bolinha grande
+canvas.addEventListener("click", function (event) {
+  // Encontra a bolinha clicada
+  const clickedCircle = encontrarBolinhaClicada(event);
+
+  if (clickedCircle) {
+    // Atualiza a cor da bolinha grande clicada com a nova cor selecionada pelo usuário
+    atualizarBolinhaGrande(clickedCircle);
+    // Esta função é responsável por atualizar as cores escolhidas pelo usuário.
+    atualizarCoresEscolhidas(cores_escolhidas_usuario, clickedCircle);
+    // Redesenha todas as bolinhas grandes
+    desenharBolinhasGrandes();
+  }
+});
+
+// button para verificar
+const btn = document.getElementById("btnConferir");
+let jogada_atual = 0;
+
+btn.addEventListener("click", () => {
+  // Desabilita o botão
+  btn.disabled = true;
+
+  const linha_bolinha_media = posicao_bolinhas_medias[jogada_atual];
+  const linha_bolinha_pequena = posicao_bolinhas_pequenas[jogada_atual];
+
+  for (let i = 0; i < 4; i++) {
+    linha_bolinha_media.forEach((circle, index) => {
+      if (index === i) {
+        ctx.beginPath();
+        ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
+        ctx.fillStyle = cores_escolhidas_usuario[i];
+        ctx.fill();
+        ctx.closePath();
+      }
+    });
+  }
+
+  desenharBolinhasPequenas(
+    linha_bolinha_pequena,
+    cores_escolhidas_usuario,
+    senha
+  );
+
+  // Verifica a jogada
+  const senha_correta = verificaJogada(senha, cores_escolhidas_usuario);
+  if (senha_correta) {
+    // Jogada correta
+    alert("Senha correta!");
+    setTimeout(() => {
+      location.reload();
+    }, 6500);
+  } else {
+    // Jogada incorreta
+    console.log("Não acertou!");
+    jogada_atual++;
+  }
+  if (jogada_atual === 8) {
+    setTimeout(() => {
+      alert("Infelizmente você não conseguiu!");
+      location.reload();
+    }, 5000);
+  }
+
+  // Reativa o botão
+  btn.disabled = false;
+});
 
 const posicao_bolinhas_medias = [
   /* linha 1 */
@@ -199,38 +232,38 @@ const posicao_bolinhas_medias = [
   ],
   /* Linha 5 */
   [
-    { x: 158, y: 466, radius: 9 },
-    { x: 212, y: 466, radius: 9 },
-    { x: 266, y: 466, radius: 9 },
-    { x: 320, y: 466, radius: 9 },
-  ],
-  /* Linha 5 */
-  [
     { x: 158, y: 406, radius: 9 },
     { x: 212, y: 406, radius: 9 },
     { x: 266, y: 406, radius: 9 },
     { x: 320, y: 406, radius: 9 },
   ],
-  /* Linha 6 */
+  /* Linha 5 */
   [
     { x: 158, y: 346, radius: 9 },
     { x: 212, y: 346, radius: 9 },
     { x: 266, y: 346, radius: 9 },
     { x: 320, y: 346, radius: 9 },
   ],
-  /* Linha 7 */
+  /* Linha 6 */
   [
     { x: 158, y: 286, radius: 9 },
     { x: 212, y: 286, radius: 9 },
     { x: 266, y: 286, radius: 9 },
     { x: 320, y: 286, radius: 9 },
   ],
-  /* Linha 8 */
+  /* Linha 7 */
   [
     { x: 158, y: 226, radius: 9 },
     { x: 212, y: 226, radius: 9 },
     { x: 266, y: 226, radius: 9 },
     { x: 320, y: 226, radius: 9 },
+  ],
+  /* Linha 8 */
+  [
+    { x: 158, y: 166, radius: 9 },
+    { x: 212, y: 166, radius: 9 },
+    { x: 266, y: 166, radius: 9 },
+    { x: 320, y: 166, radius: 9 },
   ],
 ];
 
